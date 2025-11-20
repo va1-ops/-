@@ -1,0 +1,34 @@
+name: Chaoxing Auto Course
+
+on:
+  schedule:
+    # 每天早上9点运行（使用UTC时间，北京时间需要+8小时）
+    - cron: '0 1 * * *'
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  auto-course:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      
+      - name: Install dependencies
+        run: npm install puppeteer
+      
+      - name: Run auto course script
+        env:
+          CHAOXING_USERNAME: ${{ secrets.CHAOXING_USERNAME }}
+          CHAOXING_PASSWORD: ${{ secrets.CHAOXING_PASSWORD }}
+        run: node chaoxing-cloud-auto.js
+      
+      - name: Upload progress
+        uses: actions/upload-artifact@v3
+        with:
+          name: progress
+          path: progress.json
